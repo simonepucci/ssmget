@@ -30,6 +30,6 @@ do
     #VARCONT=$(aws ssm get-parameter --name ${PARAMPATH}/${VARCUR} --query Parameter.Value);
     echo export $VARCUR=$VARCONT
 done
-rm -f ${TMPDIR}/${EC2SSM};
-rm -f ${TMPDIR}/${EC2SSMIDX};
+rm -f ${EC2SSM};
+rm -f ${EC2SSMIDX};
 rmdir ${TMPDIR};
