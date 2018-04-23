@@ -23,11 +23,13 @@ cat ${EC2SSMIDX} | while read line;
 do
     #Extract interesting stuff
     # ["Parameters",0,"Name"]
-    NAMEKEYNUM=$(egrep "\[\"Parameters\"\,$line\,\"Name\"" ${EC2SSM} |tr -s '[:blank:]' ' '| cut -f '2' -d ' ' | sed 's/"//g')
-    NAMEKEYVAL=$(egrep "\[\"Parameters\"\,$line\,\"Value\"" ${EC2SSM}|tr -s '[:blank:]' ' '| cut -f '2' -d ' ');# | sed 's/"//g')
-    #echo ${NAMEKEYNUM}
+    NAMEKEYNUM=$(grep -E "\[\"Parameters\"\,$line\,\"Name\"" ${EC2SSM} |tr -s '[:blank:]' ' '| cut -f '2' -d ' ' | sed 's/"//g');
+    NAMEKEYVAL=$(grep -E "\[\"Parameters\"\,$line\,\"Value\"" ${EC2SSM}|tr -s '[:blank:]' ' '| cut -f '2' -d ' ');
     VARCUR=$(basename ${NAMEKEYNUM});
     VARCONT=${NAMEKEYVAL};
     #VARCONT=$(aws ssm get-parameter --name ${PARAMPATH}/${VARCUR} --query Parameter.Value);
     echo export $VARCUR=$VARCONT
 done
+rm -f ${TMPDIR}/${EC2SSM};
+rm -f ${TMPDIR}/${EC2SSMIDX};
+rmdir ${TMPDIR};
