@@ -15,8 +15,10 @@ mkdir -p ${TMPDIR};
 
 [ -f "${EC2SSM}" ] && rm -f ${EC2SSM};
 
+AZ=$(curl -f http://169.254.169.254/latest/meta-data/placement/availability-zone 2> /dev/null);
+REGION=${AZ:0:${#AZ} - 1};
 
-aws ssm get-parameters-by-path --path ${PARAMPATH} --recursive | JSON.sh -b > ${EC2SSM}
+aws ssm get-parameters-by-path --path ${PARAMPATH} --recursive --region ${REGION} | JSON.sh -b > ${EC2SSM}
 cat ${EC2SSM} | awk '{print $1}' | cut -f '2' -d ',' | grep -o '[0-9]*' | sort -n | uniq > ${EC2SSMIDX};
 
 cat ${EC2SSMIDX} | while read line;
@@ -27,7 +29,6 @@ do
     NAMEKEYVAL=$(grep -E "\[\"Parameters\"\,$line\,\"Value\"" ${EC2SSM}|tr -s '[:blank:]' ' '| cut -f '2' -d ' ');
     VARCUR=$(basename ${NAMEKEYNUM});
     VARCONT=${NAMEKEYVAL};
-    #VARCONT=$(aws ssm get-parameter --name ${PARAMPATH}/${VARCUR} --query Parameter.Value);
     echo export $VARCUR=$VARCONT
 done
 rm -f ${EC2SSM};
