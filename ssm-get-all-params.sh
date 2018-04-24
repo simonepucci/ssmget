@@ -28,10 +28,10 @@ CLUSTERECS=$(grep -E "\[\"Cluster\"" ${ECSMETA} |tr -s '[:blank:]' ' '| cut -f '
 curl http://${HOSTIP}:51678/v1/tasks | JSON.sh -b > ${ECSTASKS} 2> /dev/null;
 TASKID=$(grep ${HOSTNAME} ${ECSTASKS} | awk '{print $1}' | cut -f '2' -d ',' | grep -o '[0-9]*');
 TASKFAMILY=$(grep -E "\[\"Tasks\"\,$TASKID\,\"Family\"" ${ECSTASKS} | tr -s '[:blank:]' ' '| cut -f '2' -d ' ' | sed 's/"//g');
-SEARCHPATH=${PARAMPATH:-"/${CLUSTERECS}/${TASKFAMILY}"};
+SEARCHPATH=${PARAMPATH:-"/DeploymentConfig/${CLUSTERECS}/${TASKFAMILY}"};
 
-aws ssm get-parameters-by-path --path ${SEARCHPATH} --recursive --region ${REGION} | JSON.sh -b > ${EC2SSM}
-#aws ssm get-parameters-by-path --path ${PARAMPATH} --recursive --region ${REGION} | JSON.sh -b > ${EC2SSM}
+aws ssm get-parameters-by-path --path ${SEARCHPATH} --recursive --region ${REGION} | JSON.sh -b > ${EC2SSM};
+
 cat ${EC2SSM} | awk '{print $1}' | cut -f '2' -d ',' | grep -o '[0-9]*' | sort -n | uniq > ${EC2SSMIDX};
 
 cat ${EC2SSMIDX} | while read line;
