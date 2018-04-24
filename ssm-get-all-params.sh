@@ -8,7 +8,8 @@
 # 
 [ $# -eq 1 ] && PARAMPATH="$1" || unset PARAMPATH;
 
-TMPDIR="/tmp/Ec2ssm";
+[ -d /dev/shm ] && TMPCACHEFOLD="/dev/shm" || TMPCACHEFOLD="/tmp";
+TMPDIR="${TMPCACHEFOLD}/Ec2ssm";
 EC2SSM="${TMPDIR}/ec2-ssm.tmp";
 EC2SSMIDX="${TMPDIR}/ec2-ssm-idx.tmp";
 ECSMETA="${TMPDIR}/ec2-ecsmeta.tmp";
