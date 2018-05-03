@@ -22,11 +22,11 @@ REGION=${AZ:0:${#AZ} - 1};
 
 #Get Cluster name from docker-host metadata
 HOSTIP=$(curl -f http://169.254.169.254/latest/meta-data/local-ipv4 2> /dev/null);
-curl http://${HOSTIP}:51678/v1/metadata | JSON.sh -b > ${ECSMETA} 2> /dev/null;
+curl http://${HOSTIP}:51678/v1/metadata 2> /dev/null | JSON.sh -b > ${ECSMETA} 2> /dev/null;
 CLUSTERECS=$(grep -E "\[\"Cluster\"" ${ECSMETA} |tr -s '[:blank:]' ' '| cut -f '2' -d ' ' | sed 's/"//g');
 
 #Find task def family in order to build PARAMPATH dynamically
-curl http://${HOSTIP}:51678/v1/tasks | JSON.sh -b > ${ECSTASKS} 2> /dev/null;
+curl http://${HOSTIP}:51678/v1/tasks 2> /dev/null | JSON.sh -b > ${ECSTASKS} 2> /dev/null;
 TASKID=$(grep ${HOSTNAME} ${ECSTASKS} | awk '{print $1}' | cut -f '2' -d ',' | grep -o '[0-9]*');
 TASKFAMILY=$(grep -E "\[\"Tasks\"\,$TASKID\,\"Family\"" ${ECSTASKS} | tr -s '[:blank:]' ' '| cut -f '2' -d ' ' | sed 's/"//g');
 SEARCHPATH=${PARAMPATH:-"/DeploymentConfig/${CLUSTERECS}/${TASKFAMILY}"};
